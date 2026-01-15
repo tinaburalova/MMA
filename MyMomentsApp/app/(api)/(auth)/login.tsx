@@ -1,10 +1,18 @@
 import { Text, View, StyleSheet, ImageBackground } from "react-native";
-import { AuthContext } from "@/utils/authContext";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
+
+import * as WebBrowser from "expo-web-browser";
+import * as Google from "expo-auth-session/providers/google";
+
+import { useAuth } from "@/context/AuthContext";
+
 import Button from "@/components/Button";
 import AppBackground from "@/components/AppBackground";
 import LeafLogo from "@/components/LeafLogo";
 
+
+// Toto povie prehliadaču, aby po prihlásení vrátil kontrolu aplikácii
+WebBrowser.maybeCompleteAuthSession();
 
 // 1. Logo komponent pre názov aplikácie
 const AppLogo: React.FC = () => (
@@ -24,7 +32,28 @@ const PlaceholderGraphic: React.FC = () => (
 
 // 3. Hlavný komponent prihlasovacej obrazovky
 const LoginScreen: React.FC = () => {
-    const authState = useContext(AuthContext);
+    const { signIn } = useAuth();
+
+    // 4. Konfigurácia Google prihlásenia
+    const [request, response, promptAsync] = Google.useAuthRequest({
+        iosClientId: "6129931752-9mdfip5qe2o46gpoc128hujb4dcaj1eu.apps.googleusercontent.com",
+        // Ak neskôr vytvoríš Android, pridáš ho sem:
+        // androidClientId: "..."
+    });
+
+    // 5. Sledovanie odpovede z Google
+    useEffect(() => {
+        if (response?.type === "success") {
+            const { authentication } = response;
+            
+            // Tu simulujeme získanie dát (neskôr ich budeme ťahať z Google API)
+            signIn({
+                id: authentication?.accessToken || "google-id",
+                name: "Užívateľ MyMoments",
+                email: "user@example.com"
+            });
+        }
+    }, [response]);
 
     return ( 
         // CELÁ OBRAZOVKA JE ZABALENÁ do AppBackground
@@ -41,8 +70,11 @@ const LoginScreen: React.FC = () => {
             {/* Tlačidlo posunuté dole, do 'Thumb Zone' */}
             <View style={styles.buttonZone}>
                 <Button 
-                    onPress={authState.logIn}
-                    label="Prihlásiť sa" 
+                    // Tlačidlo je vypnuté, kým sa nepripraví Google request
+                    disabled={!request}
+                    // 6. Spustenie Google okna
+                    onPress={() => promptAsync()}
+                    label="Prihlásiť sa cez Google" 
                     theme="primary" />
                 <Text style={styles.actionText}>
                     Registrovať sa!

@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { LogBox } from "react-native";
-import { AuthProvider } from "@/utils/authContext";
+import { AuthProvider } from "@/context/AuthContext";
 
 //how to prevent warnings 
 LogBox.ignoreAllLogs(true);
@@ -20,7 +20,7 @@ export default function RootLayout() {
             }}
           />
           <Stack.Screen
-            name="login"
+            name="(auth)/login"
             options={{
               headerShown: false,
               animation: "none",

@@ -1,4 +1,4 @@
-import { AuthContext } from "@/utils/authContext";
+import { useAuth } from "@/context/AuthContext"; // Používame náš nový Hook
 import { Redirect, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useContext } from "react";
@@ -16,10 +16,10 @@ const isLogin = false;
 
 
 export default function ProtectedLayout() {
-  const authState = useContext(AuthContext);
+  const { isLoggedIn } = useAuth();
 
-  if (!authState.isLoggedIn) {
-    return <Redirect href = "/login" />;
+  if (!isLoggedIn) {
+    return <Redirect href="/login" />;
   }
 
   return (
@@ -30,7 +30,7 @@ export default function ProtectedLayout() {
             name="(tabs)" 
             options ={{ 
               headerShown: false,
-              headerLeft: () => <></> ///šípka vľavo/späť prázdna, z indexu sa nedá vraciať je to homescreen
+              //headerLeft: () => <></> ///šípka vľavo/späť prázdna, z indexu sa nedá vraciať je to homescreen
             }} 
           />
       </Stack>
